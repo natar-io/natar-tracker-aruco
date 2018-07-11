@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
 
     rapidjson::Document jsonMarkers;
     jsonMarkers.SetObject();
-    rapidjson::Document::AllocatorType allocator = jsonMarkers.GetAllocator();
+    rapidjson::Document::AllocatorType &allocator = jsonMarkers.GetAllocator();
 
     rapidjson::Value* markersObj = ARUCOMarkersToJSON(ids, corners, allocator);
     jsonMarkers.AddMember("markers", *markersObj, allocator);
@@ -84,6 +84,7 @@ int main(int argc, char** argv) {
     rapidjson::StringBuffer strbuf;
     rapidjson::Writer<rapidjson::StringBuffer> writer(strbuf);
     jsonMarkers.Accept(writer);
+    std::cerr << strbuf.GetString() << std::endl;
 
     imshow("out", imageCopy);
     waitKey();
