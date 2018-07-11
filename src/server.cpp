@@ -44,11 +44,16 @@ rapidjson::Value* ARUCOMarkerToJSON(int id, int dir, int confidence, float* cent
     return markerObj;
 }
 
-void ARUCOMarkersToJSON(std::vector<int> ids, std::vector<std::vector<Point2f>> corners, rapidjson::Document::AllocatorType& allocator) {
+rapidjson::Value* ARUCOMarkersToJSON(std::vector<int> ids, std::vector<std::vector<Point2f>> corners, rapidjson::Document::AllocatorType& allocator) {
+    rapidjson::Value* markersObj = new rapidjson::Value(rapidjson::kArrayType);
     for (int i = 0 ; i < ids.size() ; i++) {
         float* center = new float[2]; center[0] = 0; center[1] = 0;
-        rapidjson::Value* markersObj = ARUCOMarkerToJSON(ids[i], 0, 100, center, corners[i], allocator);
+        rapidjson::Value* markerObj = ARUCOMarkerToJSON(ids[i], 0, 100, center, corners[i], allocator);
+        markersObj->PushBack(*markerObj, allocator);
+        delete markerObj;
+        delete[] center;
     }
+    return markersObj;
 }
 
 int main(int argc, char** argv) {
@@ -58,6 +63,7 @@ int main(int argc, char** argv) {
     std::vector<std::vector<Point2f> > corners, rejected;
     Mat image = imread(argv[1], CV_LOAD_IMAGE_COLOR);
     Mat imageCopy; image.copyTo(imageCopy);
+
     aruco::detectMarkers(image, dictionary, corners, ids, detectorParams, rejected);
 
     if (ids.size() > 0) {
@@ -66,6 +72,18 @@ int main(int argc, char** argv) {
         std::cerr << "No aruco markers found" << std::endl;
         aruco::drawDetectedMarkers(imageCopy, rejected, noArray(), Scalar(100, 0, 255));
     }
+
+    rapidjson::Document jsonMarkers;
+    jsonMarkers.SetObject();
+    rapidjson::Document::AllocatorType allocator = jsonMarkers.GetAllocator();
+
+    rapidjson::Value* markersObj = ARUCOMarkersToJSON(ids, corners, allocator);
+    jsonMarkers.AddMember("markers", *markersObj, allocator);
+    delete markersObj;
+
+    rapidjson::StringBuffer strbuf;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(strbuf);
+    jsonMarkers.Accept(writer);
 
     imshow("out", imageCopy);
     waitKey();
