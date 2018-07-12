@@ -174,7 +174,13 @@ rapidjson::Value* ARUCOMarkerToJSON(int id, int dir, int confidence, float* cent
 rapidjson::Value* ARUCOMarkersToJSON(std::vector<int> ids, std::vector<std::vector<Point2f>> corners, rapidjson::Document::AllocatorType& allocator) {
     rapidjson::Value* markersObj = new rapidjson::Value(rapidjson::kArrayType);
     for (int i = 0 ; i < ids.size() ; i++) {
-        float* center = new float[2]; center[0] = 0; center[1] = 0;
+        float* center = new float[2]; center[0] = 0 ; center[1] = 0;
+        for (int j = 0 ; j < corners[i].size() ; j++) {
+            center[0] += corners[i][j].x;
+            center[1] += corners[i][j].y;
+        }
+        center[0] /= corners[i].size();
+        center[1] /= corners[i].size();
         rapidjson::Value* markerObj = ARUCOMarkerToJSON(ids[i], 0, 100, center, corners[i], allocator);
         markersObj->PushBack(*markerObj, allocator);
         delete markerObj;
