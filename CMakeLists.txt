@@ -9,12 +9,15 @@ if (NOT OpenCV_FOUND)
     message(FATAL_ERROR "Could not find OpenCV")
 endif()
 
-find_package(redisimagehelper)
-find_package(hiredis)
-find_package(RapidJSON)
-find_package(ev)
+find_package(redisimagehelper REQUIRED)
+find_package(hiredis REQUIRED)
+find_package(RapidJSON REQUIRED)
+find_package(ev REQUIRED)
+find_package(cxxopts REQUIRED)
+
+include_directories(${REDISIMAGEHELPER_INCLUDE_DIR})
 
 set(ARUCO_DETECTION_SERVER
         src/server.cpp)
 add_executable(aruco-server ${ARUCO_DETECTION_SERVER})
-target_link_libraries(aruco-server ${OpenCV_LIBS})
+target_link_libraries(aruco-server ${OpenCV_LIBS} ${REDISIMAGEHELPER_LIBS} ${HIREDIS_LIBS} ${EV_LIBS})
