@@ -35,6 +35,7 @@ struct contextData {
 };
 
 Ptr<aruco::Dictionary> DICTIONARY = aruco::getPredefinedDictionary(aruco::DICT_ARUCO_ORIGINAL);
+Ptr<aruco::DetectorParameters> parameters;
 
 static int parseCommandLine(cxxopts::Options options, int argc, char** argv)
 {
@@ -192,8 +193,11 @@ rapidjson::Value* ARUCOMarkersToJSON(std::vector<int> ids, std::vector<std::vect
 std::string process(Image* image) {
     std::vector<int> ids;
     std::vector<std::vector<Point2f> > corners;
+
+    // parameters = aruco::DetectorParameters::create();
+    // parameters->markerBorderBits = 1;
     cv::Mat imageCv(image->height(), image->width(), CV_8UC3, image->data());
-    aruco::detectMarkers(imageCv, DICTIONARY, corners, ids);
+    aruco::detectMarkers(imageCv, DICTIONARY, corners, ids); //parameters);
 
     rapidjson::Document jsonMarkers;
     jsonMarkers.SetObject();
