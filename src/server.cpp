@@ -299,10 +299,17 @@ int main(int argc, char** argv) {
         bool loop = true;
         while (loop) {
             Image* image = clientSync.getImage(data.width, data.height, data.channels);
-            std::string json = process(image);
-            clientSync.setString((char*)json.c_str(), redisOutputKey);
-            std::cerr << json << std::endl;
-            delete image;
+            if (image != NULL) {
+                std::string json = process(image);
+                clientSync.setString((char*)json.c_str(), redisOutputKey);
+                if (VERBOSE) {
+                    std::cerr << json << std::endl;
+                }
+                delete image;
+            }
+            else {
+                std::cerr << "Error: Failed to retreive image from data" << std::endl;
+            }
             loop = SET_MODE ? true : false;
         }
     }
