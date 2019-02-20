@@ -21,3 +21,5 @@ set(ARUCO_DETECTION_SERVER
         src/server.cpp)
 add_executable(aruco-server ${ARUCO_DETECTION_SERVER})
 target_link_libraries(aruco-server ${OpenCV_LIBS} ${REDISIMAGEHELPER_LIBS} ${HIREDIS_LIBS} ${EV_LIBS})
+
+install (TARGETS aruco-server DESTINATION bin)
