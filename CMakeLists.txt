@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.2)
-project (aruco-server VERSION 0.1)
+project (natar-tracker-aruco VERSION 0.1)
 
 set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/module)
@@ -19,7 +19,7 @@ include_directories(${REDISIMAGEHELPER_INCLUDE_DIR})
 
 set(ARUCO_DETECTION_SERVER
         src/server.cpp)
-add_executable(aruco-server ${ARUCO_DETECTION_SERVER})
-target_link_libraries(aruco-server ${OpenCV_LIBS} ${REDISIMAGEHELPER_LIBS} ${HIREDIS_LIBS} ${EV_LIBS})
+add_executable(${PROJECT_NAME} ${ARUCO_DETECTION_SERVER})
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} ${REDISIMAGEHELPER_LIBS} ${HIREDIS_LIBS} ${EV_LIBS})
 
-install (TARGETS aruco-server DESTINATION bin)
+install (TARGETS ${PROJECT_NAME} DESTINATION bin)
