@@ -27,9 +27,9 @@ static int redisPort = 6379;
 using namespace cv;
 
 struct contextData {
-    uint width;
-    uint height;
-    uint channels;
+    int width;
+    int height;
+    int channels;
     RedisImageHelperSync* clientSync;
 };
 
@@ -214,7 +214,7 @@ std::string process(Image* image) {
 
 void onImagePublished(redisAsyncContext* c, void* rep, void* privdata) {
     redisReply *reply = (redisReply*) rep;
-    if  (reply == NULL) { return; }
+    if  (reply == nullptr) { return; }
     if (reply->type != REDIS_REPLY_ARRAY || reply->elements != 3) {
         if (VERBOSE) {
             std::cerr << "Error: Bad reply format." << std::endl;
@@ -223,19 +223,19 @@ void onImagePublished(redisAsyncContext* c, void* rep, void* privdata) {
     }
 
     struct contextData* data = static_cast<struct contextData*>(privdata);
-    if (data == NULL) {
+    if (data == nullptr) {
         if(VERBOSE) {
             std::cerr << "Error: Could not retrieve context data from private data." << std::endl;
         }
         return;
     }
-    uint width = data->width;
-    uint height = data->height;
-    uint channels = data->channels;
+    int width = data->width;
+    int height = data->height;
+    int channels = data->channels;
     RedisImageHelperSync* clientSync = data->clientSync;
 
     Image* image = clientSync->getImage(width, height, channels, redisInputKey);
-    if (image == NULL) {
+    if (image == nullptr) {
         if (VERBOSE) {
             std::cerr << "Error: Could not retrieve image from data." << std::endl;
         }
@@ -243,9 +243,9 @@ void onImagePublished(redisAsyncContext* c, void* rep, void* privdata) {
     }
     std::string json = process(image);
     if (SET_MODE) {
-        clientSync->setString((char*)json.c_str(), redisOutputKey);
+        clientSync->setString(json, redisOutputKey);
     }
-    clientSync->publishString((char*)json.c_str(), redisOutputKey);
+    clientSync->publishString(json, redisOutputKey);
     if (VERBOSE) {
         std::cerr << json << std::endl;
     }
@@ -275,6 +275,9 @@ int main(int argc, char** argv) {
         std::cerr << "Cannot connect to redis server. Please ensure that a redis server is up and running." << std::endl;
         return EXIT_FAILURE;
     }
+    std::string cmd = std::string("client setname trackers:aruco:").append(redisOutputKey);
+    redisReply* reply = clientSync.executeCommand(cmd);
+    freeReplyObject(reply);
 
     struct contextData data;
     data.width = clientSync.getInt(redisInputCameraParametersKey + ":width");
@@ -299,9 +302,9 @@ int main(int argc, char** argv) {
         bool loop = true;
         while (loop) {
             Image* image = clientSync.getImage(data.width, data.height, data.channels);
-            if (image != NULL) {
+            if (image != nullptr) {
                 std::string json = process(image);
-                clientSync.setString((char*)json.c_str(), redisOutputKey);
+                clientSync.setString(json, redisOutputKey);
                 if (VERBOSE) {
                     std::cerr << json << std::endl;
                 }
