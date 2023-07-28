@@ -246,9 +246,11 @@ void onImagePublished(redisAsyncContext* c, void* rep, void* privdata) {
         return;
     }
     std::string json = process(image);
-    if (SET_MODE) {
-        clientSync->setString(json, redisOutputKey);
-    }
+    //if (SET_MODE) {
+    
+    // TODO: API uniformisation in progress, do both for now.
+    clientSync->setString(json, redisOutputKey);
+    // }
     clientSync->publishString(json, redisOutputKey);
     if (VERBOSE) {
         std::cerr << json << std::endl;
