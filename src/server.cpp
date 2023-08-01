@@ -14,7 +14,7 @@
 #include <RedisImageHelper.hpp>
 
 static bool VERBOSE = false;
-static bool STREAM_MODE = false;
+static bool STREAM_MODE = true;
 static bool SET_MODE = false;
 
 static std::string redisInputKey = "camera0";
@@ -132,10 +132,10 @@ static int parseCommandLine(cxxopts::Options options, int argc, char** argv)
         }
     }
 
-    if (!result.count("u") && !result.count("s") && !result.count("g")) {
-        std::cerr << "You need to specify at least the stream method option with -u, -s or -g" << std::endl;
-        return EXIT_FAILURE;
-    }
+    // if (!result.count("u") && !result.count("s") && !result.count("g")) {
+    //     std::cerr << "You need to specify at least the stream method option with -u, -s or -g" << std::endl;
+    //     return EXIT_FAILURE;
+    // }
 
     return EXIT_SUCCESS;
 }
@@ -250,12 +250,11 @@ void onImagePublished(redisAsyncContext* c, void* rep, void* privdata) {
     
     // TODO: API uniformisation in progress, do both for now.
     clientSync->setString(json, redisOutputKey);
-    // }
     clientSync->publishString(json, redisOutputKey);
     if (VERBOSE) {
         std::cerr << json << std::endl;
     }
-    delete image;
+    // delete image;
 }
 
 int main(int argc, char** argv) {

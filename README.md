@@ -24,7 +24,7 @@ This should create one executables : **natar-tracker-aruco**.
 
 ## Running the tracker
 
-The tracker server comes with a lot of command line options. You can check them all using the following command `./redis-camera-server -h`.
+The tracker server comes with a lot of command line options. You can check them all using the following command `./natar-tracker-aruco -h`.
 ```
 Usage:
  natar-tracker-aruco [OPTION...]
